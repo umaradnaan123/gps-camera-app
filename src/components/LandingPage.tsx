@@ -74,13 +74,13 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStartApp, onNavigate
             className="flex flex-wrap justify-center lg:justify-start gap-4"
           >
             <button
-              onClick={onStartApp}
+              onClick={() => onNavigate('camera', '/gps-camera-app')}
               className="px-6 py-3.5 bg-brand-500 hover:bg-brand-650 text-white rounded-xl shadow-xl shadow-brand-500/25 transition duration-150 font-bold text-xs flex items-center gap-2 hover:scale-105 active:scale-95"
             >
               <Camera size={16} /> Start Capturing Geotags
             </button>
             <button
-              onClick={onStartApp}
+              onClick={() => onNavigate('upload', '/exif-metadata-editor')}
               className="px-6 py-3.5 bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-850 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-200 rounded-xl shadow-sm transition duration-150 font-bold text-xs flex items-center gap-2 hover:scale-105 active:scale-95"
             >
               <Upload size={16} /> Drag & Drop EXIF Image
