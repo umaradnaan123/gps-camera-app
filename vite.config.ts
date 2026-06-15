@@ -4,4 +4,22 @@ import react from '@vitejs/plugin-react'
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react()],
+  build: {
+    chunkSizeWarningLimit: 1200,
+    rollupOptions: {
+      output: {
+        manualChunks(id) {
+          if (id.includes('node_modules')) {
+            if (id.includes('leaflet')) {
+              return 'vendor-leaflet';
+            }
+            if (id.includes('react-webcam') || id.includes('exifr') || id.includes('piexifjs')) {
+              return 'vendor-camera-exif';
+            }
+            return 'vendor';
+          }
+        }
+      }
+    }
+  }
 })
