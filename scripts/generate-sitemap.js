@@ -5,7 +5,7 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const BASE_URL = process.env.SITE_URL || 'https://aptitude-problem-solver.vercel.app';
+const BASE_URL = 'https://gps-camera-app-wmps.vercel.app';
 
 const CORE_ROUTES = [
   '/',

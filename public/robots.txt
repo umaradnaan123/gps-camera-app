@@ -5,4 +5,4 @@ Disallow: /api/
 Disallow: /auth/
 Disallow: /dashboard
 
-Sitemap: https://aptitude-problem-solver.vercel.app/sitemap.xml
+Sitemap: https://gps-camera-app-wmps.vercel.app/sitemap.xml

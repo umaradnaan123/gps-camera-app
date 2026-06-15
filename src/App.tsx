@@ -76,7 +76,7 @@ function App() {
       canonical.setAttribute('rel', 'canonical');
       document.head.appendChild(canonical);
     }
-    canonical.setAttribute('href', `${window.location.origin}${path}`);
+    canonical.setAttribute('href', `https://gps-camera-app-wmps.vercel.app${path}`);
 
     // Update Meta Title & Description Dynamically based on active path
     let title = 'GeoTag Pro – Free GPS Camera, Geotagged Photo Capture, Location Verification & EXIF Metadata Editor';
@@ -102,7 +102,7 @@ function App() {
       "@context": "https://schema.org",
       "@type": "WebApplication",
       "name": "GeoTag Pro",
-      "url": `${window.location.origin}${path}`,
+      "url": `https://gps-camera-app-wmps.vercel.app${path}`,
       "applicationCategory": "BusinessApplication",
       "operatingSystem": "All",
       "description": description,
