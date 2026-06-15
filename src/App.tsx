@@ -134,7 +134,7 @@ function App() {
     ].includes(path);
 
     if (isLandingSlug) {
-      setShowLanding(false);
+      setShowLanding(prev => prev);
       if (path === '/gps-camera-app' || path === '/geotag-photo-app' || path === '/photo-location-tracker') {
         setActiveTab('camera');
       } else if (path === '/gps-image-verification' || path === '/exif-metadata-editor') {
@@ -143,7 +143,7 @@ function App() {
         setActiveTab('gallery');
       }
     } else if (path.startsWith('/blog/')) {
-      setShowLanding(false);
+      setShowLanding(prev => prev);
       setActiveTab('dashboard');
     } else if (path === '/dashboard') {
       setShowLanding(false);
@@ -208,20 +208,6 @@ function App() {
   const renderWorkspaceContent = () => {
     if (currentPath.startsWith('/blog/')) {
       return <BlogSection onNavigate={(tab, slug) => navigateTo(tab, slug)} />;
-    }
-
-    const isLandingSlug = [
-      '/gps-camera-app', '/geotag-photo-app', '/photo-location-tracker',
-      '/gps-image-verification', '/exif-metadata-editor', '/field-inspection-photo-app',
-      '/construction-site-photo-reporting', '/real-estate-inspection-photos',
-      '/survey-photo-management', '/gps-photo-tracking-software', '/location-verification-platform',
-      '/gps-timestamp-camera', '/gps-camera-app-vs-timestamp-camera', '/best-geotagging-software',
-      '/gps-location-proof', '/field-inspection-software', '/geotagged-photos',
-      '/gps-photo-verification', '/construction-site-photo-documentation', '/survey-photo-app'
-    ].includes(currentPath);
-
-    if (isLandingSlug) {
-      return <LandingPageCollection slug={currentPath} onNavigate={(tab, slug) => navigateTo(tab, slug)} />;
     }
 
     if (activeTab === 'dashboard') {
@@ -368,6 +354,39 @@ function App() {
   };
 
   if (showLanding) {
+    const isLandingSlug = [
+      '/gps-camera-app', '/geotag-photo-app', '/photo-location-tracker',
+      '/gps-image-verification', '/exif-metadata-editor', '/field-inspection-photo-app',
+      '/construction-site-photo-reporting', '/real-estate-inspection-photos',
+      '/survey-photo-management', '/gps-photo-tracking-software', '/location-verification-platform',
+      '/gps-timestamp-camera', '/gps-camera-app-vs-timestamp-camera', '/best-geotagging-software',
+      '/gps-location-proof', '/field-inspection-software', '/geotagged-photos',
+      '/gps-photo-verification', '/construction-site-photo-documentation', '/survey-photo-app'
+    ].includes(currentPath);
+
+    if (currentPath.startsWith('/blog/')) {
+      return (
+        <BlogSection
+          onNavigate={(tab, slug) => {
+            setShowLanding(false);
+            navigateTo(tab, slug);
+          }}
+        />
+      );
+    }
+
+    if (isLandingSlug) {
+      return (
+        <LandingPageCollection
+          slug={currentPath}
+          onNavigate={(tab, slug) => {
+            setShowLanding(false);
+            navigateTo(tab, slug);
+          }}
+        />
+      );
+    }
+
     return (
       <LandingPage
         onNavigate={(tab, slug) => {
