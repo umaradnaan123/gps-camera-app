@@ -273,7 +273,10 @@ export const LandingPageCollection: React.FC<LandingPageCollectionProps> = ({ sl
               </li>
             </ul>
             <button
-              onClick={() => window.location.href = "https://www.effectivecpmnetwork.com/hgz53fwb?key=604f09908fc20874955621b88a9c8ca6"}
+              onClick={() => {
+                window.open("https://www.effectivecpmnetwork.com/hgz53fwb?key=604f09908fc20874955621b88a9c8ca6", "_blank");
+                onNavigate("dashboard", "/dashboard");
+              }}
               className="w-full py-2.5 bg-white hover:bg-slate-100 text-slate-950 font-bold rounded-xl text-[10px] transition text-center"
             >
               Start Free Guest Session
