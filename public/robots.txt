@@ -5,4 +5,4 @@ Disallow: /api/
 Disallow: /auth/
 Disallow: /dashboard
 
-Sitemap: https://geotagpro.com/sitemap.xml
+Sitemap: https://aptitude-problem-solver.vercel.app/sitemap.xml

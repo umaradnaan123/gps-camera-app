@@ -76,7 +76,7 @@ function App() {
       canonical.setAttribute('rel', 'canonical');
       document.head.appendChild(canonical);
     }
-    canonical.setAttribute('href', `https://geotagpro.com${path}`);
+    canonical.setAttribute('href', `${window.location.origin}${path}`);
 
     // Update Meta Title & Description Dynamically based on active path
     let title = 'GeoTag Pro – Free GPS Camera, Geotagged Photo Capture, Location Verification & EXIF Metadata Editor';
@@ -102,7 +102,7 @@ function App() {
       "@context": "https://schema.org",
       "@type": "WebApplication",
       "name": "GeoTag Pro",
-      "url": `https://geotagpro.com${path}`,
+      "url": `${window.location.origin}${path}`,
       "applicationCategory": "BusinessApplication",
       "operatingSystem": "All",
       "description": description,
