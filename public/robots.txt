@@ -1,4 +1,8 @@
 User-agent: *
 Allow: /
+Disallow: /admin
+Disallow: /api/
+Disallow: /auth/
+Disallow: /dashboard
 
 Sitemap: https://geotagpro.com/sitemap.xml

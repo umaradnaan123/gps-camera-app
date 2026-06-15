@@ -3,11 +3,10 @@ import { motion } from 'framer-motion';
 import { Camera, MapPin, ShieldCheck, Download, Layers, Sparkles, Navigation, CheckCircle2, ChevronRight, Upload } from 'lucide-react';
 
 interface LandingPageProps {
-  onStartApp: () => void;
   onNavigate: (tab: 'dashboard' | 'camera' | 'upload' | 'gallery', pathSlug: string) => void;
 }
 
-export const LandingPage: React.FC<LandingPageProps> = ({ onStartApp, onNavigate }) => {
+export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate }) => {
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-805 dark:text-slate-100 overflow-x-hidden relative transition-colors duration-300">
       
@@ -26,7 +25,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStartApp, onNavigate
         </div>
         <div className="flex gap-4">
           <button
-            onClick={onStartApp}
+            onClick={() => window.location.href = "https://www.effectivecpmnetwork.com/x946vg2zs4?key=247400cdfbed66491d3f84b3f3652bc6"}
             className="px-4.5 py-2 bg-slate-900 hover:bg-slate-800 dark:bg-white dark:hover:bg-slate-100 text-white dark:text-slate-950 text-xs font-bold rounded-xl shadow-lg transition duration-200 flex items-center gap-1.5 hover:scale-105 active:scale-95"
           >
             Launch Console <ChevronRight size={14} />
@@ -272,7 +271,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStartApp, onNavigate
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.5, delay: i * 0.1 }}
-              onClick={() => onNavigate(feat.tab, feat.path)}
+              onClick={() => window.location.href = "https://www.effectivecpmnetwork.com/y64k0hg8e?key=b6e031570e1ac4dcce264194b1bf0101"}
               className="bg-white dark:bg-slate-900 border border-slate-200/60 dark:border-slate-850 rounded-2xl p-6 shadow-sm flex flex-col justify-between group hover:shadow-xl hover:border-brand-300 dark:hover:border-brand-800 transition duration-300 cursor-pointer"
             >
               <div className="space-y-4">
@@ -305,7 +304,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStartApp, onNavigate
               Start a guest session inside your browser. No sign-ups or subscription licenses required—all assets process locally in your device sandbox.
             </p>
             <button
-              onClick={onStartApp}
+              onClick={() => window.location.href = "https://www.effectivecpmnetwork.com/hgz53fwb?key=604f09908fc20874955621b88a9c8ca6"}
               className="mx-auto px-6 py-3.5 bg-white hover:bg-slate-105 text-indigo-700 rounded-xl text-xs font-bold shadow-2xl transition duration-150 flex items-center gap-2 hover:scale-105 active:scale-95"
             >
               Start Free Guest Session <ChevronRight size={14} />

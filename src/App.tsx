@@ -7,6 +7,8 @@ import { GalleryView } from './components/GalleryView';
 import { MultiMap } from './components/MultiMap';
 import { type GeotaggedPhoto, getAllPhotos } from './utils/db';
 import { LandingPage } from './components/LandingPage';
+import { LandingPageCollection } from './components/LandingPageCollection';
+import { BlogSection } from './components/BlogSection';
 
 type AppTab = 'dashboard' | 'camera' | 'upload' | 'gallery';
 
@@ -52,10 +54,20 @@ function App() {
   const [photosList, setPhotosList] = useState<GeotaggedPhoto[]>([]);
   const [editingPhoto, setEditingPhoto] = useState<Partial<GeotaggedPhoto> & { imageBlob: Blob } | null>(null);
   const [isNewPhoto, setIsNewPhoto] = useState(false);
+  const [currentPath, setCurrentPath] = useState<string>(window.location.pathname);
+
+  // POPSTATE router listeners
+  useEffect(() => {
+    const handlePopState = () => {
+      setCurrentPath(window.location.pathname);
+    };
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
 
   // SEO virtual router matching friendly URLs
   useEffect(() => {
-    const path = window.location.pathname;
+    const path = currentPath;
     
     // Update canonical link element dynamically
     let canonical = document.querySelector('link[rel="canonical"]');
@@ -66,32 +78,87 @@ function App() {
     }
     canonical.setAttribute('href', `https://geotagpro.com${path}`);
 
-    // Map matching slugs to app tabs
-    if (path === '/gps-camera-app' || path === '/geotag-photo-app' || path === '/photo-location-tracker') {
+    // Update Meta Title & Description Dynamically based on active path
+    let title = 'GeoTag Pro – Free GPS Camera, Geotagged Photo Capture, Location Verification & EXIF Metadata Editor';
+    let description = 'Capture photos with GPS coordinates, address, timestamps, Google Maps links, and EXIF metadata. Upload, edit, verify, store, download, and share geotagged images online.';
+    
+    if (path.startsWith('/blog/')) {
+      const slug = path.split('/').pop() || '';
+      title = `${slug.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase())} | GeoTag Pro Blog`;
+      description = 'Read expert compliance inspection guides, EXIF analysis, and location auditing tutorials.';
+    } else if (path !== '/' && path !== '/dashboard') {
+      title = `${path.replace(/\//g, '').replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase())} | GeoTag Pro Platform`;
+      description = `Professional client-side utility for ${path.replace(/\//g, '').replace(/-/g, ' ')}. Capture, edit, and export visual metadata logs.`;
+    }
+
+    document.title = title;
+    let metaDesc = document.querySelector('meta[name="description"]');
+    if (metaDesc) {
+      metaDesc.setAttribute('content', description);
+    }
+
+    // Dynamic JSON-LD Schema Injector
+    let schemaObj = {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "GeoTag Pro",
+      "url": `https://geotagpro.com${path}`,
+      "applicationCategory": "BusinessApplication",
+      "operatingSystem": "All",
+      "description": description,
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      }
+    };
+
+    let existingSchema = document.getElementById('seo-schema');
+    if (existingSchema) {
+      existingSchema.remove();
+    }
+    const script = document.createElement('script');
+    script.id = 'seo-schema';
+    script.type = 'application/ld+json';
+    script.innerHTML = JSON.stringify(schemaObj);
+    document.head.appendChild(script);
+
+    const isLandingSlug = [
+      '/gps-camera-app', '/geotag-photo-app', '/photo-location-tracker',
+      '/gps-image-verification', '/exif-metadata-editor', '/field-inspection-photo-app',
+      '/construction-site-photo-reporting', '/real-estate-inspection-photos',
+      '/survey-photo-management', '/gps-photo-tracking-software', '/location-verification-platform',
+      '/gps-timestamp-camera', '/gps-camera-app-vs-timestamp-camera', '/best-geotagging-software',
+      '/gps-location-proof', '/field-inspection-software', '/geotagged-photos',
+      '/gps-photo-verification', '/construction-site-photo-documentation', '/survey-photo-app'
+    ].includes(path);
+
+    if (isLandingSlug) {
       setShowLanding(false);
-      setActiveTab('camera');
-    } else if (path === '/gps-image-verification' || path === '/exif-metadata-editor') {
+      if (path === '/gps-camera-app' || path === '/geotag-photo-app' || path === '/photo-location-tracker') {
+        setActiveTab('camera');
+      } else if (path === '/gps-image-verification' || path === '/exif-metadata-editor') {
+        setActiveTab('upload');
+      } else {
+        setActiveTab('gallery');
+      }
+    } else if (path.startsWith('/blog/')) {
       setShowLanding(false);
-      setActiveTab('upload');
-    } else if (path === '/field-inspection-photo-app' || path === '/construction-site-photo-reporting') {
-      setShowLanding(false);
-      setActiveTab('gallery');
+      setActiveTab('dashboard');
     } else if (path === '/dashboard') {
       setShowLanding(false);
       setActiveTab('dashboard');
+    } else if (path === '/') {
+      setShowLanding(true);
     }
-  }, []);
+  }, [currentPath]);
 
   const navigateTo = (tab: AppTab, pathSlug?: string) => {
     setActiveTab(tab);
     setEditingPhoto(null);
     if (pathSlug) {
       window.history.pushState(null, '', pathSlug);
-      
-      let canonical = document.querySelector('link[rel="canonical"]');
-      if (canonical) {
-        canonical.setAttribute('href', `https://geotagpro.com${pathSlug}`);
-      }
+      setCurrentPath(pathSlug);
     }
   };
 
@@ -138,10 +205,171 @@ function App() {
     .sort((a, b) => new Date(b.date + 'T' + b.time).getTime() - new Date(a.date + 'T' + a.time).getTime())
     .slice(0, 3);
 
+  const renderWorkspaceContent = () => {
+    if (currentPath.startsWith('/blog/')) {
+      return <BlogSection onNavigate={(tab, slug) => navigateTo(tab, slug)} />;
+    }
+
+    const isLandingSlug = [
+      '/gps-camera-app', '/geotag-photo-app', '/photo-location-tracker',
+      '/gps-image-verification', '/exif-metadata-editor', '/field-inspection-photo-app',
+      '/construction-site-photo-reporting', '/real-estate-inspection-photos',
+      '/survey-photo-management', '/gps-photo-tracking-software', '/location-verification-platform',
+      '/gps-timestamp-camera', '/gps-camera-app-vs-timestamp-camera', '/best-geotagging-software',
+      '/gps-location-proof', '/field-inspection-software', '/geotagged-photos',
+      '/gps-photo-verification', '/construction-site-photo-documentation', '/survey-photo-app'
+    ].includes(currentPath);
+
+    if (isLandingSlug) {
+      return <LandingPageCollection slug={currentPath} onNavigate={(tab, slug) => navigateTo(tab, slug)} />;
+    }
+
+    if (activeTab === 'dashboard') {
+      return (
+        <div className="space-y-6">
+          {/* Dashboard Hero Header */}
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-gradient-to-r from-violet-650 to-indigo-700 text-white p-6 md:p-8 rounded-2xl shadow-xl border border-violet-500/20">
+            <div className="space-y-1">
+              <h2 className="text-2xl md:text-3xl font-extrabold tracking-tight">Welcome to GeoTag Pro</h2>
+              <p className="text-xs text-violet-100 max-w-md">
+                Capture photos live with browser geolocations, read/write embedded EXIF coordinate tags, and manage visual metadata records securely.
+              </p>
+            </div>
+            <div className="flex gap-3 w-full md:w-auto">
+              <button
+                onClick={() => navigateTo('camera', '/gps-camera-app')}
+                className="flex-1 md:flex-none px-4 py-2.5 bg-white hover:bg-slate-100 text-violet-750 rounded-xl text-xs font-bold shadow-lg transition flex items-center justify-center gap-2"
+              >
+                <Camera size={14} /> Capture
+              </button>
+              <button
+                onClick={() => navigateTo('upload', '/exif-metadata-editor')}
+                className="flex-1 md:flex-none px-4 py-2.5 bg-violet-500 hover:bg-violet-550 border border-violet-400/30 text-white rounded-xl text-xs font-bold shadow-lg transition flex items-center justify-center gap-2"
+              >
+                <Upload size={14} /> Upload
+              </button>
+            </div>
+          </div>
+
+          {/* Dashboard stats numbers */}
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            {[
+              { label: 'Photos Geotagged', value: totalCount, icon: MapPin, color: 'text-violet-500' },
+              { label: 'Favorites Marked', value: favCount, icon: Heart, color: 'text-red-500' },
+              { label: 'Cities Cataloged', value: uniqueCities, icon: Sparkles, color: 'text-emerald-500' },
+              { label: 'Countries Visited', value: uniqueCountries, icon: LayoutGrid, color: 'text-amber-500' },
+            ].map((stat, i) => (
+              <div key={i} className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 shadow-sm flex items-center gap-3">
+                <div className={`p-2.5 bg-slate-50 dark:bg-slate-950 rounded-xl ${stat.color} shadow-sm border border-slate-100 dark:border-slate-850`}>
+                  <stat.icon size={18} />
+                </div>
+                <div>
+                  <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">{stat.label}</span>
+                  <span className="text-lg font-black">{stat.value}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Split visual section: Map pins overview & Recent activity */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            {/* All maps pin map (7 cols) */}
+            <div className="lg:col-span-7 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 shadow-sm flex flex-col h-96">
+              <h3 className="text-xs font-black uppercase tracking-wider text-slate-400 mb-3 flex items-center gap-1.5">
+                <span>Stored Coordinates Overview</span>
+              </h3>
+              <div className="flex-1 w-full rounded-xl overflow-hidden relative">
+                <MultiMap photos={photosList} onSelectPhoto={(p) => {
+                  setEditingPhoto(p);
+                  setIsNewPhoto(false);
+                }} />
+              </div>
+            </div>
+
+            {/* Recent uploads gallery log (5 cols) */}
+            <div className="lg:col-span-5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 shadow-sm flex flex-col justify-between">
+              <div>
+                <h3 className="text-xs font-black uppercase tracking-wider text-slate-400 mb-3.5">
+                  Recent Activity
+                </h3>
+                {recentPhotos.length === 0 ? (
+                  <div className="text-center py-16 text-slate-400">
+                    <MapPin className="w-12 h-12 text-slate-200 dark:text-slate-800 mx-auto mb-2" />
+                    <p className="text-xs">No photos stored yet.</p>
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    {recentPhotos.map((photo) => (
+                      <RecentPhotoItem
+                        key={photo.id}
+                        photo={photo}
+                        onClick={() => {
+                          setEditingPhoto(photo);
+                          setIsNewPhoto(false);
+                        }}
+                      />
+                    ))}
+                  </div>
+                )}
+              </div>
+              
+              {photosList.length > 3 && (
+                <button
+                  onClick={() => navigateTo('gallery', '/field-inspection-photo-app')}
+                  className="w-full mt-4 py-2 bg-slate-50 hover:bg-slate-100 dark:bg-slate-950 dark:hover:bg-slate-900/60 border border-slate-200/60 dark:border-slate-850 text-slate-600 dark:text-slate-350 text-xs font-bold rounded-xl transition"
+                >
+                  View Full Photo Log ({photosList.length} total)
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    if (activeTab === 'camera') {
+      return (
+        <div className="space-y-6">
+          <CameraModule
+            onPhotoReady={handlePhotoReady}
+            onCancel={() => navigateTo('dashboard', '/dashboard')}
+          />
+        </div>
+      );
+    }
+
+    if (activeTab === 'upload') {
+      return (
+        <div className="space-y-6">
+          <ImageUpload
+            onPhotoReady={handlePhotoReady}
+            onCancel={() => navigateTo('dashboard', '/dashboard')}
+          />
+        </div>
+      );
+    }
+
+    return (
+      <div className="space-y-6">
+        <div className="flex justify-between items-center">
+          <div>
+            <h2 className="text-2xl font-black text-slate-850 dark:text-slate-100">Saved Photo Geotags</h2>
+            <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+              Manage, filter, search, and export your geotagged photo catalog.
+            </p>
+          </div>
+        </div>
+        <GalleryView onEditPhoto={(photo) => {
+          setEditingPhoto(photo);
+          setIsNewPhoto(false);
+        }} />
+      </div>
+    );
+  };
+
   if (showLanding) {
     return (
       <LandingPage
-        onStartApp={() => navigateTo('dashboard', '/dashboard')}
         onNavigate={(tab, slug) => {
           setShowLanding(false);
           navigateTo(tab, slug);
@@ -249,144 +477,7 @@ function App() {
               }}
             />
           ) : (
-            /* TAB CORRELATION CONTROLLER */
-            <>
-              {activeTab === 'dashboard' && (
-                <div className="space-y-6">
-                  {/* Dashboard Hero Header */}
-                  <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-gradient-to-r from-violet-650 to-indigo-700 text-white p-6 md:p-8 rounded-2xl shadow-xl border border-violet-500/20">
-                    <div className="space-y-1">
-                      <h2 className="text-2xl md:text-3xl font-extrabold tracking-tight">Welcome to GeoTag Pro</h2>
-                      <p className="text-xs text-violet-100 max-w-md">
-                        Capture photos live with browser geolocations, read/write embedded EXIF coordinate tags, and manage visual metadata records securely.
-                      </p>
-                    </div>
-                    <div className="flex gap-3 w-full md:w-auto">
-                      <button
-                        onClick={() => navigateTo('camera', '/gps-camera-app')}
-                        className="flex-1 md:flex-none px-4 py-2.5 bg-white hover:bg-slate-100 text-violet-700 rounded-xl text-xs font-bold shadow-lg transition flex items-center justify-center gap-2"
-                      >
-                        <Camera size={14} /> Capture
-                      </button>
-                      <button
-                        onClick={() => navigateTo('upload', '/exif-metadata-editor')}
-                        className="flex-1 md:flex-none px-4 py-2.5 bg-violet-500 hover:bg-violet-550 border border-violet-400/30 text-white rounded-xl text-xs font-bold shadow-lg transition flex items-center justify-center gap-2"
-                      >
-                        <Upload size={14} /> Upload
-                      </button>
-                    </div>
-                  </div>
-
-                  {/* Dashboard stats numbers */}
-                  <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-                    {[
-                      { label: 'Photos Geotagged', value: totalCount, icon: MapPin, color: 'text-violet-500' },
-                      { label: 'Favorites Marked', value: favCount, icon: Heart, color: 'text-red-500' },
-                      { label: 'Cities Cataloged', value: uniqueCities, icon: Sparkles, color: 'text-emerald-500' },
-                      { label: 'Countries Visited', value: uniqueCountries, icon: LayoutGrid, color: 'text-amber-500' },
-                    ].map((stat, i) => (
-                      <div key={i} className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 shadow-sm flex items-center gap-3">
-                        <div className={`p-2.5 bg-slate-50 dark:bg-slate-950 rounded-xl ${stat.color} shadow-sm border border-slate-100 dark:border-slate-850`}>
-                          <stat.icon size={18} />
-                        </div>
-                        <div>
-                          <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">{stat.label}</span>
-                          <span className="text-lg font-black">{stat.value}</span>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-
-                  {/* Split visual section: Map pins overview & Recent activity */}
-                  <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-                    {/* All maps pin map (7 cols) */}
-                    <div className="lg:col-span-7 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 shadow-sm flex flex-col h-96">
-                      <h3 className="text-xs font-black uppercase tracking-wider text-slate-400 mb-3 flex items-center gap-1.5">
-                        <span>Stored Coordinates Overview</span>
-                      </h3>
-                      <div className="flex-1 w-full rounded-xl overflow-hidden relative">
-                        <MultiMap photos={photosList} onSelectPhoto={(p) => {
-                          setEditingPhoto(p);
-                          setIsNewPhoto(false);
-                        }} />
-                      </div>
-                    </div>
-
-                    {/* Recent uploads gallery log (5 cols) */}
-                    <div className="lg:col-span-5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 shadow-sm flex flex-col justify-between">
-                      <div>
-                        <h3 className="text-xs font-black uppercase tracking-wider text-slate-400 mb-3.5">
-                          Recent Activity
-                        </h3>
-                        {recentPhotos.length === 0 ? (
-                          <div className="text-center py-16 text-slate-400">
-                            <MapPin className="w-12 h-12 text-slate-200 dark:text-slate-800 mx-auto mb-2" />
-                            <p className="text-xs">No photos stored yet.</p>
-                          </div>
-                        ) : (
-                          <div className="space-y-3">
-                            {recentPhotos.map((photo) => (
-                              <RecentPhotoItem
-                                key={photo.id}
-                                photo={photo}
-                                onClick={() => {
-                                  setEditingPhoto(photo);
-                                  setIsNewPhoto(false);
-                                }}
-                              />
-                            ))}
-                          </div>
-                        )}
-                      </div>
-                      
-                      {photosList.length > 3 && (
-                        <button
-                          onClick={() => navigateTo('gallery', '/field-inspection-photo-app')}
-                          className="w-full mt-4 py-2 bg-slate-50 hover:bg-slate-100 dark:bg-slate-950 dark:hover:bg-slate-900/60 border border-slate-200/60 dark:border-slate-850 text-slate-600 dark:text-slate-350 text-xs font-bold rounded-xl transition"
-                        >
-                          View Full Photo Log ({photosList.length} total)
-                        </button>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {activeTab === 'camera' && (
-                <div className="space-y-6">
-                  <CameraModule
-                    onPhotoReady={handlePhotoReady}
-                    onCancel={() => navigateTo('dashboard', '/dashboard')}
-                  />
-                </div>
-              )}
-
-              {activeTab === 'upload' && (
-                <div className="space-y-6">
-                  <ImageUpload
-                    onPhotoReady={handlePhotoReady}
-                    onCancel={() => navigateTo('dashboard', '/dashboard')}
-                  />
-                </div>
-              )}
-
-              {activeTab === 'gallery' && (
-                <div className="space-y-6">
-                  <div className="flex justify-between items-center">
-                    <div>
-                      <h2 className="text-2xl font-black text-slate-850 dark:text-slate-100">Saved Photo Geotags</h2>
-                      <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-                        Manage, filter, search, and export your geotagged photo catalog.
-                      </p>
-                    </div>
-                  </div>
-                  <GalleryView onEditPhoto={(photo) => {
-                    setEditingPhoto(photo);
-                    setIsNewPhoto(false);
-                  }} />
-                </div>
-              )}
-            </>
+            renderWorkspaceContent()
           )}
         </div>
       </main>

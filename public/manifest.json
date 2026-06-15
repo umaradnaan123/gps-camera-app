@@ -1,0 +1,24 @@
+{
+  "short_name": "GeoTag Pro",
+  "name": "GeoTag Pro - GPS Camera & EXIF Editor",
+  "description": "Capture photos with GPS coordinates, address, timestamps, and manage visual metadata records securely client-side.",
+  "icons": [
+    {
+      "src": "data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%236d28d9%22/><text y=%22.75em%22 x=%220.15em%22 font-size=%2260%22>📍</text></svg>",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%236d28d9%22/><text y=%22.75em%22 x=%220.15em%22 font-size=%2260%22>📍</text></svg>",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "start_url": "/dashboard",
+  "background_color": "#020617",
+  "theme_color": "#6d28d9",
+  "display": "standalone",
+  "orientation": "portrait"
+}
